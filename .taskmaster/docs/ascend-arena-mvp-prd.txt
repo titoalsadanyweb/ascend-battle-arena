@@ -1,0 +1,164 @@
+<context>
+# Overview
+Ascend Arena is a gamified accountability platform designed for users aged 15–25 to overcome unwanted habits (e.g., porn) through daily self-mastery battles and alliance-based support. The MVP (Phase 1) is complete and includes daily check-ins, dynamic quests, token rewards, and one-to-one Ally pairing, leveraging research-backed mechanics (variable rewards, progressive penalties, adaptive quests) to maximize engagement and efficacy. The platform is built with React, TypeScript, Supabase, and a mobile-first, accessible UI.
+
+# Core Features (Phase 1 Complete)
+- **Profiles & Auth**: User profiles with preferences, avatar, rank, and secure authentication.
+- **Daily Check-In & Streaks**: Users declare daily victories, tracked as check-ins. Streaks are visualized and rewarded with tokens (Valor Shards).
+- **Dynamic Quest System**: Each day, users receive a micro-quest (mindfulness, reflection, activity, etc.) from a diverse, adaptive quest bank. Completing quests grants bonus tokens.
+- **Token Economy**: Tokens are earned via check-ins, quests, milestones, and can be spent on cosmetic unlocks in the Store. All transactions are tracked in a ledger.
+- **Ally Pairing & Accountability**: Users can pair with a Battle Ally for mutual support. Ally status, streaks, and recent activity are visible. Shared contracts and encouragement features foster accountability.
+- **Commitment Contracts**: Users can create short-term (1–3 day) contracts with token stakes. Success returns the stake; failure results in loss, with recovery quests available.
+- **Regroup Missions**: After missed check-ins or failed contracts, users can complete a reflection mission to recover part of their lost tokens.
+- **Progress Visualization**: A 30-day journey map shows daily check-in status, streaks, and milestones.
+- **Minimal Ally‑only Feed**: Displays key events (streaks, quest completions, contract results).
+- **Onboarding & Personalization**: Guided onboarding collects preferences (timezone, quest types, reminder times) to personalize the experience.
+- **Mobile-First, Accessible UI**: Built with Tailwind, Shadcn UI, and Framer Motion for responsive, accessible, and engaging interactions.
+
+# User Experience
+- **Personas**: Target users are 15–25, seeking self-improvement and accountability in a supportive, non-judgmental environment.
+- **Key Flows**:
+  1. **Onboarding**: User signs up, sets preferences, and is prompted to find an Ally.
+  2. **Daily Use**: User checks in, completes quest, views streak and token balance, interacts with Ally.
+  3. **Ally Pairing**: User invites or is matched with an Ally, can view Ally's progress and send encouragement.
+  4. **Commitment Contract**: User creates a short contract, stakes tokens, and tracks progress. On completion, tokens are returned or lost, with recovery options.
+  5. **Store**: User spends tokens on avatar themes, dashboard skins, and special items.
+- **UI/UX Considerations**:
+  - Energetic yet supportive visual theme (deep blues/teals, gold accents).
+  - Clear calls-to-action ("Declare Victory Today", "Find Battle Ally").
+  - Accessible, mobile-first layouts with large touch targets and semantic HTML.
+  - Animations for feedback (check-in confetti, rank-up effects).
+  - Privacy-first: pseudonymous profiles, minimal required info, RLS enforced.
+
+</context>
+<PRD>
+# Technical Architecture
+- **Frontend**: React (TypeScript), React Router, TanStack Query, Tailwind CSS, Shadcn UI, Framer Motion.
+- **Backend**: Supabase (Postgres, Auth, Edge Functions), RLS for all user data.
+- **Core Tables**:
+  - `profiles`: user info, streaks, token balance, preferences, avatar, rank.
+  - `check_ins`: daily check-in records (date, status, tokens, quest, reflection).
+  - `quests`: quest bank (prompt, type, difficulty, tags).
+  - `quest_completions`: user quest completions (submission, tokens, shared_with_ally).
+  - `token_transactions`: all token economy events (type, amount, related ids).
+  - `allies`: one-to-one Ally relationships (status, preferences_matched).
+  - `commitments`: contracts (user, ally, dates, stake, status, failure count).
+  - `ally_feed`: Ally-only event feed (event_type, details, metadata).
+  - `posts`, `bets`: social feed and token-backed bets (Phase 2+).
+- **APIs**:
+  - Auth: Supabase Auth (email/password, Google OAuth).
+  - REST endpoints for profile, check-in, quest, commitment, feed, notifications.
+  - Edge Functions for scheduled jobs (daily reset, contract resolution, reminders).
+- **Security**:
+  - RLS on all tables: users access only their data and Ally-shared data.
+  - No public profiles in MVP. All data encrypted in transit and at rest.
+
+# Development Roadmap
+## A. Currently Complete (Phase 1 Done)
+- Profiles & Auth
+- Daily Check‑In & Streak Logic
+- Quest System (static bank)
+- Token Economy + Ledger
+- Basic Ally Pairing (1:1 invite/stubbed match)
+- Commitment Contracts (1–3 day, fixed penalties)
+- Regroup Missions
+- Dashboard & Journey Map
+- Minimal Ally‑only Feed
+
+## B. Phase 2: Core Social & Accountability Enhancements
+| #   | Feature                        | Backend Work                                                      | Frontend Work                                         | Depends On | Complexity |
+|-----|--------------------------------|-------------------------------------------------------------------|------------------------------------------------------|------------|------------|
+| 2.1 | Enhanced Feed (Rich Media + Bets) | Posts & Bets tables, RLS policies                                 | FeedPage + Post/Bid components, Media upload UI       | Phase 1    | Med        |
+| 2.2 | Public Commitments             | Link commitments → posts, Extend bets logic                       | UI for "Make Public Pledge" with stake chooser        | 2.1        | Med        |
+| 2.3 | Ally Matching Algorithm        | Matching function/service (timezone, prefs, language, country), Compatibility scoring table | Onboarding multi‑ally flow, "Find Allies" UI wizard   | Phase 1    | High       |
+| 2.4 | Real‑Time Chat (1:1 & Group)  | Realtime channel setup (Supabase Realtime or WebSocket), Chat table (messages, attachments) | Chat UI with images/voice notes, Notifications & badge | 2.3        | High       |
+| 2.5 | Token‑Backed Encouragement    | Encourage table (user→ally tips), API to send/accept tips         | "Tip" buttons on feed, chat reactions, Tooltip on tip status | 2.1, 2.4  | Med        |
+| 2.6 | Advanced Notifications & Reminders | Notification table & triggers (post, chat, pledge events)         | Notification center, toasts, email integration        | 2.4, Phase 1 | Med      |
+
+## C. Phase 3: Community, Gamification & Analytics
+| #   | Feature                        | Backend Work                                                      | Frontend Work                                         | Depends On | Complexity |
+|-----|--------------------------------|-------------------------------------------------------------------|------------------------------------------------------|------------|------------|
+| 3.1 | Public Community Feed          | Public posts table & RLS, Moderation flags                        | CommunityFeed page, filtering, search                 | 2.1        | High       |
+| 3.2 | Clans / Team Wars              | Clans table, membership, war events, Clan scoring                 | ClanBrowser, ClanDashboard, war UI                    | 3.1        | High       |
+| 3.3 | Leaderboards (Global & Clans)  | Aggregation views for streaks, bets, tips                         | Leaderboard component/page                            | 3.1, 3.2   | Medium     |
+| 3.4 | AI‑Driven Personalized Quests  | AI challenge engine service, Quest personalization table           | "My Quests" UI, difficulty slider, feedback           | Phase 1, 2 | High       |
+| 3.5 | Analytics Dashboard            | Metrics tables (DAU, engagement, contract success rates)          | Admin/Insights page with charts                       | Phase 1, 2 | Medium     |
+| 3.6 | Rewards Marketplace            | Marketplace items table, purchase transactions                    | Store redesign with filters, categories               | Phase 1    | Med        |
+
+# Social Networking & Support Feature Enhancements (Phases 2 & 3)
+- **Enhanced Ally Interaction System**:
+  - Real-time chat (1:1 & group)
+  - Structured support messages and quick responses
+  - Token-based encouragement system (tips, badges)
+  - Joint challenges and commitments
+  - Progress sharing and celebration features
+- **Advanced Ally Matching System**:
+  - Preference-based matching algorithm
+  - Compatibility scoring
+  - Multiple ally support (not just one-to-one)
+  - Ally rotation system for fresh perspectives
+- **Social Feed Enhancements**:
+  - Rich media support for posts
+  - Reaction system (likes, supports, etc.)
+  - Comment threads for discussions
+  - Achievement and milestone sharing
+- **Accountability Features**:
+  - Scheduled check-ins
+  - Progress tracking between allies
+  - Shared goals and milestones
+  - Mutual accountability contracts
+  - Success/failure impact sharing
+- **Community Features**:
+  - Group challenges
+  - Community-wide events
+  - Leaderboards and rankings
+  - Public profiles with achievements
+  - Community guidelines and moderation
+- **Support System**:
+  - Emergency support requests
+  - Scheduled support sessions
+  - Resource sharing
+  - Success story sharing
+  - Mentorship opportunities
+- **Gamification Enhancements**:
+  - Team achievements
+  - Joint rewards
+  - Competitive elements
+  - Progress visualization
+  - Streak bonuses for allies
+- **Communication Tools**:
+  - Voice messages
+  - Video calls
+  - Scheduled meetings
+  - Quick check-ins
+  - Custom emojis and reactions
+- **Privacy and Safety**:
+  - Privacy controls
+  - Block/report system
+  - Content moderation
+  - Safe space guidelines
+  - Emergency contact system
+- **Analytics and Insights**:
+  - Relationship health metrics
+  - Progress tracking
+  - Success rate analysis
+  - Support effectiveness
+  - Community engagement metrics
+
+# Logical Dependency Chain
+- Profiles & Auth → Check-Ins & Quests → Token Economy → Ally Pairing → Commitments → Store & Feed → Social/Community Features → Analytics
+- Each phase builds on the previous, with core engagement and accountability features as the foundation for advanced social and community capabilities.
+
+# Risks and Mitigations
+- **Engagement Drop-Off**: Mitigated by adaptive quests, variable rewards, and recovery missions.
+- **Privacy Concerns**: Strict RLS, pseudonymous profiles, opt-in sharing only.
+- **Technical Complexity**: Use Supabase Edge Functions for scheduled jobs; keep MVP scope focused.
+- **Abuse/Spam**: Rate limiting on invites, feed posts, and chat. Moderation tools in Phase 3.
+- **Scalability**: Phased rollout, with analytics to monitor and optimize performance and engagement.
+
+# Appendix
+- **Seed Quest Bank**: Diverse prompts (mindfulness, gratitude, activity, reflection, creative, social, learning, recovery).
+- **Configurable Parameters**: Reward scaling, penalty schedule, quest bank size, reminder logic, matching criteria.
+- **Sample Calculations**: Reward = 10 + 5 × (streak-1); Milestone bonuses at 7, 14, 30 days; Penalty = 100%/50%/25% of stake; Recovery = 50%/30% of lost tokens.
+- **References**: See main project spec for research citations and rationale.
+</PRD> 

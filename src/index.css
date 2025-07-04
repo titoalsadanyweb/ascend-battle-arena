@@ -1,0 +1,157 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Ascend Arena Design System - Modern Gradients with Blue/Violet Theme */
+
+@layer base {
+  :root {
+    /* Light Mode - Blue/Violet Theme */
+    --background: 240 100% 99%;
+    --foreground: 240 15% 9%;
+
+    --card: 262 20% 95%;
+    --card-foreground: 240 15% 9%;
+
+    --popover: 262 20% 95%;
+    --popover-foreground: 240 15% 9%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 240 100% 99%;
+
+    --secondary: 280 100% 70%;
+    --secondary-foreground: 240 100% 99%;
+
+    --muted: 262 20% 90%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    --accent: 240 100% 67%;
+    --accent-foreground: 240 100% 99%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 262 20% 85%;
+    --input: 262 20% 85%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    /* Custom Ascend Arena Colors - Light */
+    --ascend-primary: 262 83% 58%;        /* Electric Blue */
+    --ascend-secondary: 280 100% 70%;     /* Violet */
+    --ascend-accent: 240 100% 67%;        /* Bright Blue */
+    --ascend-destructive: 0 100% 67%;     /* Red */
+    --ascend-success: 142 76% 36%;        /* Green */
+    --ascend-warning: 45 93% 47%;         /* Orange */
+    
+    /* Light Mode - Solid Colors */
+    --gradient-primary: hsl(262 83% 58%);
+    --gradient-secondary: hsl(280 100% 70%);
+    --gradient-card: hsl(262 20% 95%);
+    --gradient-background: hsl(262 15% 97%);
+  }
+
+  .dark {
+    /* Dark Mode - Violet Blue/Violet Theme */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 240 10% 3.9%;
+
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 262 83% 58%;
+
+    /* Custom Ascend Arena Colors - Dark */
+    --ascend-primary: 262 83% 58%;        /* Electric Blue */
+    --ascend-secondary: 280 100% 70%;     /* Violet */
+    --ascend-accent: 240 100% 67%;        /* Bright Blue */
+    --ascend-destructive: 0 100% 67%;     /* Red */
+    --ascend-success: 142 76% 36%;        /* Green */
+    --ascend-warning: 45 93% 47%;         /* Orange */
+    
+    /* Dark Gradient Backgrounds */
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 20%) 0%, hsl(280 100% 25%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(240 100% 15%) 0%, hsl(262 83% 20%) 100%);
+    --gradient-card: linear-gradient(135deg, hsl(240 10% 3.9%) 0%, hsl(240 15% 8%) 100%);
+    --gradient-background: linear-gradient(135deg, hsl(240 10% 3.9%) 0%, hsl(240 15% 8%) 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom Gradient Classes */
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-secondary {
+    background: var(--gradient-secondary);
+  }
+  
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+  
+  .gradient-background {
+    background: var(--gradient-background);
+  }
+
+  /* Enhanced gradient classes for better UI appearance */
+  .gradient-main {
+    background: hsl(262 15% 97%);
+  }
+
+  .dark .gradient-main {
+    background: linear-gradient(135deg, hsl(240 10% 3.9%) 0%, hsl(240 15% 8%) 30%, hsl(260 20% 6%) 100%);
+  }
+
+  /* Shield Logo Animation */
+  .shield-glow {
+    filter: drop-shadow(0 0 10px hsl(var(--ascend-primary) / 0.5));
+  }
+
+  .shield-pulse {
+    animation: shield-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes shield-pulse {
+    0%, 100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 10px hsl(var(--ascend-primary) / 0.5));
+    }
+    50% {
+      transform: scale(1.05);
+      filter: drop-shadow(0 0 20px hsl(var(--ascend-primary) / 0.8));
+    }
+  }
+}
