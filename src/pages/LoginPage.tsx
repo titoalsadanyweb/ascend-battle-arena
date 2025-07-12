@@ -239,7 +239,7 @@ const LoginPage = () => {
               <p className="text-muted-foreground">
                 Don't have an account?{' '}
                 <Link 
-                  to={fromAssessment ? "/signup?fromAssessment=true" : "/signup"} 
+                  to="/assessment"
                   className="text-primary hover:text-primary/80 font-semibold transition-colors"
                 >
                   Join the Battle

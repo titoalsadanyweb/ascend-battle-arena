@@ -10,9 +10,11 @@ import { motion } from 'framer-motion'
 import { useAllies } from '@/lib/hooks/useAllies'
 import { useAllyFeed } from '@/lib/hooks/useAllyFeed'
 import { useCommitments } from '@/lib/hooks/useCommitments'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { AlertCircle } from 'lucide-react'
 
 const EnhancedAllyPanel = () => {
-  const { allies, isLoading: alliesLoading } = useAllies()
+  const { allies, isLoading: alliesLoading, error } = useAllies()
   const { feedEvents, isLoading: feedLoading } = useAllyFeed()
   const { activeCommitments } = useCommitments()
   const [activeTab, setActiveTab] = useState('feed')
@@ -33,6 +35,17 @@ const EnhancedAllyPanel = () => {
           </div>
         </CardContent>
       </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Alert variant="destructive" className="my-4">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          {error.message || 'Failed to load allies. Please try again.'}
+        </AlertDescription>
+      </Alert>
     )
   }
 

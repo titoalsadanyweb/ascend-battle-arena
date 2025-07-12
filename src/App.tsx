@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider, useAuth } from '@/lib/AuthProvider'
+import { SupabaseProvider } from '@/lib/SupabaseProvider'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Index from '@/pages/Index'
 import LandingPage from '@/pages/LandingPage'
@@ -13,6 +14,8 @@ import AnalyticsPage from '@/pages/AnalyticsPage'
 import AchievementsPage from '@/pages/AchievementsPage'
 import StorePage from '@/pages/StorePage'
 import ProfilePage from '@/pages/ProfilePage'
+import BattleAssessmentPage from '@/pages/BattleAssessmentPage'
+import SignUpPage from '@/pages/SignUpPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -63,69 +66,81 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
-          <div className="App">
-            <Routes>
-              {/* Public routes */}
-              <Route path="/landing" element={
-                <PublicRoute>
-                  <LandingPage />
-                </PublicRoute>
-              } />
-              <Route path="/login" element={
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              } />
-              
-              {/* Protected routes */}
-              <Route path="/onboarding" element={
-                <ProtectedRoute>
-                  <OnboardingPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } />
-              <Route path="/community" element={
-                <ProtectedRoute>
-                  <CommunityPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/commitments" element={
-                <ProtectedRoute>
-                  <CommitmentsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/analytics" element={
-                <ProtectedRoute>
-                  <AnalyticsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/achievements" element={
-                <ProtectedRoute>
-                  <AchievementsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/store" element={
-                <ProtectedRoute>
-                  <StorePage />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile" element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
-              } />
-              
-              {/* Redirect root to landing for unauthenticated users */}
-              <Route path="*" element={<Navigate to="/landing" replace />} />
-            </Routes>
-          </div>
-        </Router>
-        <Toaster />
+        <SupabaseProvider>
+          <Router>
+            <div className="App">
+              <Routes>
+                {/* Public routes */}
+                <Route path="/landing" element={
+                  <PublicRoute>
+                    <LandingPage />
+                  </PublicRoute>
+                } />
+                <Route path="/login" element={
+                  <PublicRoute>
+                    <LoginPage />
+                  </PublicRoute>
+                } />
+                <Route path="/assessment" element={
+                  <PublicRoute>
+                    <BattleAssessmentPage />
+                  </PublicRoute>
+                } />
+                <Route path="/signup" element={
+                  <PublicRoute>
+                    <SignUpPage />
+                  </PublicRoute>
+                } />
+                
+                {/* Protected routes */}
+                <Route path="/onboarding" element={
+                  <ProtectedRoute>
+                    <OnboardingPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/" element={
+                  <ProtectedRoute>
+                    <Index />
+                  </ProtectedRoute>
+                } />
+                <Route path="/community" element={
+                  <ProtectedRoute>
+                    <CommunityPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/commitments" element={
+                  <ProtectedRoute>
+                    <CommitmentsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/analytics" element={
+                  <ProtectedRoute>
+                    <AnalyticsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/achievements" element={
+                  <ProtectedRoute>
+                    <AchievementsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/store" element={
+                  <ProtectedRoute>
+                    <StorePage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Redirect root to landing for unauthenticated users */}
+                <Route path="*" element={<Navigate to="/landing" replace />} />
+              </Routes>
+            </div>
+          </Router>
+          <Toaster />
+        </SupabaseProvider>
       </AuthProvider>
     </QueryClientProvider>
   )

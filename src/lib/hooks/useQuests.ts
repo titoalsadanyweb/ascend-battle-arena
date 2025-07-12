@@ -55,7 +55,7 @@ export const useQuests = () => {
 
       if (error) {
         console.error('Quest fetch error:', error)
-        throw error
+        throw new Error(error.message || error.error_description || 'Failed to load today\'s quest')
       }
       
       console.log('Quest data received:', data)

@@ -36,6 +36,7 @@ export const useAllyFeed = () => {
 
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('Community feed fetch error:', errorData)
         throw new Error(errorData.error || 'Failed to fetch ally feed')
       }
 

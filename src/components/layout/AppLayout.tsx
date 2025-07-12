@@ -85,6 +85,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
               size="icon"
               onClick={signOut}
               className="text-muted-foreground hover:text-foreground"
+              aria-label="Sign out"
+              title="Sign out"
             >
               <LogOut className="h-4 w-4" />
             </Button>
@@ -97,10 +99,12 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <aside className="hidden md:flex w-64 flex-col border-r bg-card/30 backdrop-blur-sm">
           <nav className="flex-1 space-y-2 p-4">
             {navItems.map((item) => (
-              <Link key={item.path} to={item.path}>
+              <Link key={item.path} to={item.path} aria-label={item.label}>
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   className="w-full justify-start gap-3"
+                  aria-label={item.label}
+                  title={item.label}
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -129,11 +133,13 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t">
           <nav className="flex items-center justify-around py-2">
             {navItems.slice(0, 5).map((item) => (
-              <Link key={item.path} to={item.path} className="p-2">
+              <Link key={item.path} to={item.path} className="p-2" aria-label={item.label}>
                 <Button
                   variant={isActive(item.path) ? "secondary" : "ghost"}
                   size="icon"
                   className="h-10 w-10"
+                  aria-label={item.label}
+                  title={item.label}
                 >
                   <item.icon className="h-4 w-4" />
                 </Button>

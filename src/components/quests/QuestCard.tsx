@@ -79,7 +79,7 @@ const QuestCard: React.FC = () => {
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Failed to load today's quest. Please try again.
+              {error.message || "Failed to load today's quest. Please try again."}
             </AlertDescription>
           </Alert>
         </CardContent>
