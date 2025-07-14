@@ -81,7 +81,7 @@ export interface Commitment {
 
 // Supabase Service Class
 export class SupabaseService {
-  private client: SupabaseClient
+  public client: SupabaseClient
   private realtimeChannels: Map<string, RealtimeChannel> = new Map()
 
   constructor() {
