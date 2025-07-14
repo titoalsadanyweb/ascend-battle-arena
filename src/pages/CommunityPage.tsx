@@ -4,6 +4,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { motion } from 'framer-motion'
 import { Users, Trophy, Heart, MessageCircle } from 'lucide-react'
 import CommunityFeed from '@/components/social/CommunityFeed'
+import PostCreator from '@/components/feed/PostCreator'
 import EnhancedAllyPanel from '@/components/social/EnhancedAllyPanel'
 
 const CommunityPage = () => {
@@ -34,8 +35,9 @@ const CommunityPage = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="lg:col-span-2"
+            className="lg:col-span-2 space-y-6"
           >
+            <PostCreator />
             <CommunityFeed />
           </motion.div>
 

@@ -30,7 +30,7 @@ const CheckInButton: React.FC<CheckInButtonProps> = ({
 
   return (
     <Button 
-      onClick={() => checkIn()}
+      onClick={() => checkIn({ status: 'victory' })}
       disabled={isCheckingIn}
       size="lg"
       className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold"

@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, FieldValues } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { NewCommitmentSchema } from '@/lib/schemas/commitment'
 import { useCreateCommitmentPost } from '@/hooks/useCreateCommitmentPost'
@@ -8,8 +8,13 @@ export default function NewCommitmentForm() {
     resolver: zodResolver(NewCommitmentSchema)
   })
   const create = useCreateCommitmentPost()
+  
+  const onSubmit = (data: FieldValues) => {
+    create.mutate(data as any)
+  }
+  
   return (
-    <form onSubmit={handleSubmit(data => create.mutate(data))} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <textarea {...register('content')} placeholder="Describe your pledge…" className="w-full p-2 border rounded" />
       <div className="flex space-x-2">
         <input type="number" {...register('stake')} placeholder="Stake (💎)" className="w-1/3 p-2 border rounded" />

@@ -466,5 +466,5 @@ export class SupabaseService {
 // Export singleton instance
 export const supabaseService = new SupabaseService()
 
-// Export types for use in components
-export type { Profile, Quest, QuestCompletion, CheckIn, Ally, AllyFeed, Commitment } 
+// Avoid export conflicts by not re-exporting types
+// Use the interfaces defined above or import directly from types file in components

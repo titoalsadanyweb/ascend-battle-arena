@@ -1,5 +1,4 @@
-
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '../AuthProvider'
 import { toast } from '@/hooks/use-toast'
@@ -29,33 +28,32 @@ export const useAchievements = () => {
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
-  const achievementsQuery = useQuery({
+  // Fetch all achievements
+  const achievements = useQuery({
     queryKey: ['achievements'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('achievements')
         .select('*')
-        .eq('is_active', true)
-        .order('requirement_value', { ascending: true })
 
       if (error) throw error
-      return (data || []) as Achievement[]
+      return data as Achievement[]
     },
   })
 
-  const userAchievementsQuery = useQuery({
+  // Fetch user achievements
+  const userAchievements = useQuery({
     queryKey: ['user-achievements', user?.id],
     queryFn: async () => {
-      if (!user) throw new Error('Not authenticated')
+      if (!user) return []
 
       const { data, error } = await supabase
         .from('user_achievements')
         .select('*')
         .eq('user_id', user.id)
-        .order('unlocked_at', { ascending: false })
 
       if (error) throw error
-      return (data || []) as UserAchievement[]
+      return data as UserAchievement[]
     },
     enabled: !!user,
   })
@@ -103,78 +101,31 @@ export const useAchievements = () => {
   const unlockAchievement = async (achievementId: string) => {
     if (!user) return
 
-    const userAchievements = userAchievementsQuery.data || []
-    const achievements = achievementsQuery.data || []
-
-    // Check if already unlocked
-    const existing = userAchievements.find(ua => ua.achievement_id === achievementId)
-    if (existing) return
-
-    // Find the achievement
-    const achievement = achievements.find(a => a.id === achievementId)
-    if (!achievement) return
-
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_achievements')
         .insert({
           user_id: user.id,
           achievement_id: achievementId,
-          bonus_tokens_awarded: achievement.bonus_tokens
+          bonus_tokens_awarded: 100
         })
-        .select()
-        .single()
 
       if (error) throw error
 
-      // Award bonus tokens
-      if (achievement.bonus_tokens > 0) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('token_balance')
-          .eq('id', user.id)
-          .single()
-
-        if (profile) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({
-              token_balance: profile.token_balance + achievement.bonus_tokens
-            })
-            .eq('id', user.id)
-
-          if (profileError) throw profileError
-
-          // Log transaction
-          await supabase
-            .from('token_transactions')
-            .insert({
-              user_id: user.id,
-              type: 'achievement_bonus',
-              amount: achievement.bonus_tokens
-            })
-        }
-      }
-
-      // Refresh queries
       queryClient.invalidateQueries({ queryKey: ['user-achievements'] })
-      queryClient.invalidateQueries({ queryKey: ['profile'] })
-
-      // Show toast
       toast({
         title: "Achievement Unlocked! 🏆",
-        description: `${achievement.name} - ${achievement.bonus_tokens} Valor Shards earned!`,
+        description: "You've earned bonus tokens!",
       })
-
     } catch (error) {
       console.error('Error unlocking achievement:', error)
     }
   }
 
   return {
-    achievements: achievementsQuery.data || [],
-    userAchievements: userAchievementsQuery.data || [],
-    isLoading: achievementsQuery.isLoading || userAchievementsQuery.isLoading,
+    achievements: achievements.data || [],
+    userAchievements: userAchievements.data || [],
+    isLoading: achievements.isLoading || userAchievements.isLoading,
     checkQuestAchievements,
     checkStreakAchievements,
     unlockAchievement,

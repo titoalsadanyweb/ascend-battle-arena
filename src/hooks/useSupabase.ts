@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { supabaseService, type Profile, type Quest, type CheckIn, type Ally, type AllyFeed, type Commitment } from '../lib/supabase-service'
+import { supabase } from '@/integrations/supabase/client'
 import { User } from '@supabase/supabase-js'
 
 export interface UseSupabaseReturn {
@@ -91,7 +92,7 @@ export function useSupabase(): UseSupabaseReturn {
     initializeAuth()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabaseService.client.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (mountedRef.current) {
           setUser(session?.user ?? null)
