@@ -1,16 +1,47 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-serve(async (req) => {
-  const supabase = createClient(Deno.env.get('SUPABASE_URL'), Deno.env.get('SUPABASE_ANON_KEY'))
-  const body = await req.json()
-  const { content, media_url, post_id, type = 'general' } = body
-  const { data: { user } } = await supabase.auth.getUser()
-  const user_id = user?.id
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-  if (!user_id) {
-    return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401 })
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
   }
+
+  try {
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authorization header missing' }), { 
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      {
+        global: {
+          headers: { Authorization: authHeader },
+        },
+      }
+    )
+    
+    const body = await req.json()
+    const { content, media_url, post_id, type = 'general' } = body
+    const { data: { user } } = await supabase.auth.getUser()
+    const user_id = user?.id
+
+    if (!user_id) {
+      return new Response(JSON.stringify({ error: 'Not authenticated' }), { 
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
 
   if (post_id) {
     // Create a comment
@@ -23,14 +54,20 @@ serve(async (req) => {
       `)
       .single()
 
-    if (commentError) {
-      return new Response(JSON.stringify({ error: commentError }), { status: 500 })
-    }
+      if (commentError) {
+        return new Response(JSON.stringify({ error: commentError }), { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
 
-    return new Response(JSON.stringify({
-      ...comment,
-      username: comment.profiles?.username
-    }), { status: 201 })
+      return new Response(JSON.stringify({
+        ...comment,
+        username: comment.profiles?.username
+      }), { 
+        status: 201,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
   } else {
     // Create a post
     const { data: post, error: postError } = await supabase
@@ -42,16 +79,28 @@ serve(async (req) => {
       `)
       .single()
 
-    if (postError) {
-      return new Response(JSON.stringify({ error: postError }), { status: 500 })
-    }
+      if (postError) {
+        return new Response(JSON.stringify({ error: postError }), { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        })
+      }
 
-    return new Response(JSON.stringify({
-      ...post,
-      username: post.profiles?.username,
-      total_staked: 0,
-      user_has_bet: false,
-      comments: []
-    }), { status: 201 })
+      return new Response(JSON.stringify({
+        ...post,
+        username: post.profiles?.username,
+        total_staked: 0,
+        user_has_bet: false,
+        comments: []
+      }), { 
+        status: 201,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      })
+    }
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), { 
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    })
   }
 }) 

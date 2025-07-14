@@ -1,16 +1,22 @@
 import { useForm, FieldValues } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { NewCommitmentSchema } from '@/lib/schemas/commitment'
-import { useCreateCommitmentPost } from '@/hooks/useCreateCommitmentPost'
+import { useCommitments } from '@/lib/hooks/useCommitments'
+import { toast } from '@/hooks/use-toast'
 
 export default function NewCommitmentForm() {
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, reset } = useForm({
     resolver: zodResolver(NewCommitmentSchema)
   })
-  const create = useCreateCommitmentPost()
+  const { createCommitment, isCreating } = useCommitments()
   
   const onSubmit = (data: FieldValues) => {
-    create.mutate(data as any)
+    createCommitment({
+      duration: Number(data.duration_days),
+      stakeAmount: Number(data.stake),
+      allyId: undefined // No ally for now
+    })
+    reset()
   }
   
   return (
@@ -24,7 +30,13 @@ export default function NewCommitmentForm() {
           <span>Make Public</span>
         </label>
       </div>
-      <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg">Create Pledge</button>
+      <button 
+        type="submit" 
+        disabled={isCreating}
+        className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
+      >
+        {isCreating ? 'Creating...' : 'Create Pledge'}
+      </button>
     </form>
   )
 } 

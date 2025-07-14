@@ -10,6 +10,7 @@ import { motion } from 'framer-motion'
 import ChatImageUpload from './ChatImageUpload'
 import { useAuth } from '@/lib/AuthProvider'
 import { toast } from '@/hooks/use-toast'
+import { supabase } from '@/integrations/supabase/client'
 
 interface PostCreatorProps {
   onPostCreate?: (post: any) => void
@@ -53,10 +54,16 @@ const PostCreator: React.FC<PostCreatorProps> = ({ onPostCreate }) => {
       if (selectedImage?.file) {
         media_url = await uploadImageToSupabase(selectedImage.file) || ''
       }
-      const res = await fetch('/functions/post-create', {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) throw new Error('Not authenticated')
+
+      const res = await fetch('https://aslozlmjcnxvwzskhtgy.supabase.co/functions/v1/post-create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: postText, media_url }),
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ content: postText, media_url, type: postType }),
       })
       const newPost = await res.json()
       onPostCreate?.(newPost)
