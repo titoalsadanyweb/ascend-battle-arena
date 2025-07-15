@@ -137,28 +137,58 @@ const CheckInSection: React.FC<CheckInSectionProps> = ({
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
+                  className="relative"
                 >
                   <Button 
                     onClick={() => checkIn({ status: 'victory' })} 
                     disabled={isCheckingIn} 
-                    className="w-full h-20 bg-gradient-to-r from-ascend-primary to-ascend-secondary hover:from-ascend-primary/90 hover:to-ascend-secondary/90 text-white font-black text-xl shadow-xl border-2 border-ascend-primary/50 transition-all duration-300 uppercase tracking-wider"
+                    className="w-full h-24 bg-gradient-to-r from-ascend-primary via-ascend-secondary to-ascend-primary hover:from-ascend-primary/90 hover:via-ascend-secondary/90 hover:to-ascend-primary/90 text-white font-black text-xl shadow-2xl border-2 border-ascend-primary/50 transition-all duration-500 uppercase tracking-wider relative overflow-hidden group"
+                    style={{
+                      background: isCheckingIn 
+                        ? 'linear-gradient(45deg, #FFD700, #FFA500, #FFD700)' 
+                        : undefined
+                    }}
                   >
+                    {/* Animated background effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                    
                     {isCheckingIn ? (
                       <motion.div 
-                        className="flex items-center gap-3 text-white"
-                        animate={{ opacity: [1, 0.5, 1] }}
-                        transition={{ duration: 1, repeat: Infinity }}
+                        className="flex items-center gap-4 text-white relative z-10"
+                        animate={{ 
+                          scale: [1, 1.05, 1],
+                          rotateY: [0, 5, -5, 0]
+                        }}
+                        transition={{ duration: 2, repeat: Infinity }}
                       >
-                        <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        DECLARING VICTORY...
+                        <motion.div 
+                          className="w-7 h-7 border-3 border-white border-t-transparent rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        />
+                        <div className="flex flex-col items-center">
+                          <span className="text-lg">⚔️ DECLARING VICTORY ⚔️</span>
+                          <span className="text-sm opacity-90">Forging your destiny...</span>
+                        </div>
                       </motion.div>
                     ) : (
                       <motion.div 
-                        className="flex items-center gap-3 text-white"
+                        className="flex items-center gap-4 text-white relative z-10"
                         whileHover={{ scale: 1.05 }}
                       >
-                        <Shield className="h-7 w-7 text-white" />
-                        <span className="tracking-widest text-white">DECLARE VICTORY TODAY</span>
+                        <motion.div
+                          animate={{ 
+                            rotate: [0, 10, -10, 0],
+                            scale: [1, 1.1, 1]
+                          }}
+                          transition={{ duration: 3, repeat: Infinity }}
+                        >
+                          <Shield className="h-8 w-8 text-white drop-shadow-lg" />
+                        </motion.div>
+                        <div className="flex flex-col items-center">
+                          <span className="text-xl tracking-widest">⚔️ DECLARE VICTORY ⚔️</span>
+                          <span className="text-sm opacity-90 tracking-wide">Claim your daily triumph</span>
+                        </div>
                       </motion.div>
                     )}
                   </Button>

@@ -3,7 +3,7 @@ import React from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import DashboardHeader from '@/components/dashboard/DashboardHeader'
 import StatsOverview from '@/components/dashboard/StatsOverview'
-import CheckInSection from '@/components/dashboard/CheckInSection'
+import EnhancedCheckInFlow from '@/components/dashboard/EnhancedCheckInFlow'
 import AdvancedQuestSection from '@/components/dashboard/AdvancedQuestSection'
 import JourneyMap from '@/components/journey/JourneyMap'
 import AllySection from '@/components/dashboard/AllySection'
@@ -57,15 +57,17 @@ const Index = () => {
             </motion.div>
           )}
 
-          {/* Check-in Section */}
+          {/* Enhanced Check-in Flow */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <CheckInSection 
+            <EnhancedCheckInFlow 
               hasCheckedInToday={dashboardData?.has_checked_in_today || false}
-              isLoading={isLoading}
+              currentStreak={dashboardData?.current_streak || 0}
+              bestStreak={dashboardData?.best_streak || 0}
+              tokenBalance={dashboardData?.token_balance || 0}
             />
           </motion.div>
 

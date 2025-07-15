@@ -226,6 +226,7 @@ export type Database = {
           created_at: string
           date_local: string
           id: string
+          is_edited: boolean | null
           status: string
           tokens_awarded: number
           user_id: string
@@ -234,6 +235,7 @@ export type Database = {
           created_at?: string
           date_local: string
           id?: string
+          is_edited?: boolean | null
           status: string
           tokens_awarded: number
           user_id: string
@@ -242,6 +244,7 @@ export type Database = {
           created_at?: string
           date_local?: string
           id?: string
+          is_edited?: boolean | null
           status?: string
           tokens_awarded?: number
           user_id?: string
@@ -912,6 +915,10 @@ export type Database = {
           success_streak: number
         }[]
       }
+      get_user_token_balance: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       handle_checkin_transaction: {
         Args: {
           p_user_id: string
@@ -966,6 +973,10 @@ export type Database = {
       reward_successful_commitment: {
         Args: { p_commitment_id: string }
         Returns: Json
+      }
+      update_token_balance: {
+        Args: { p_user_id: string; p_amount: number }
+        Returns: undefined
       }
     }
     Enums: {
