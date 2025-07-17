@@ -101,12 +101,16 @@ const JourneyMap: React.FC<JourneyMapProps> = ({ checkInsHistory, isLoading }) =
               return (
                 <Tooltip key={date}>
                   <TooltipTrigger asChild>
-                    <div
+                     <div
                       className={`
                         w-8 h-8 border-2 rounded flex items-center justify-center
                         transition-all hover:scale-110 cursor-pointer
                         ${getNodeColor(date)}
                       `}
+                      onClick={() => {
+                        // Future: Could open edit dialog here
+                        console.log('Date clicked:', date)
+                      }}
                     >
                       {getNodeIcon(date)}
                     </div>

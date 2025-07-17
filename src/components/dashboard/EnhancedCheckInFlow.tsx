@@ -49,9 +49,9 @@ const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
     try {
       await checkIn({ status: 'victory' })
       setShowCelebration(true)
-      // Refetch dashboard data to update UI immediately
+      // Force refetch immediately after check-in
+      await refetch()
       setTimeout(() => {
-        refetch()
         setShowCelebration(false)
       }, 2000)
     } catch (error) {

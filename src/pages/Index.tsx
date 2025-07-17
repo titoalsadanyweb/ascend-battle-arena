@@ -5,7 +5,7 @@ import DashboardHeader from '@/components/dashboard/DashboardHeader'
 import StatsOverview from '@/components/dashboard/StatsOverview'
 import EnhancedCheckInFlow from '@/components/dashboard/EnhancedCheckInFlow'
 import AdvancedQuestSection from '@/components/dashboard/AdvancedQuestSection'
-import JourneyMap from '@/components/journey/JourneyMap'
+import EditableJourneyMap from '@/components/dashboard/EditableJourneyMap'
 import AllySection from '@/components/dashboard/AllySection'
 import RegroupMissionCard from '@/components/commitments/RegroupMissionCard'
 import { useDashboard } from '@/lib/hooks/useDashboard'
@@ -95,10 +95,10 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <JourneyMap 
-              checkInsHistory={dashboardData?.check_ins_history || []}
-              isLoading={isLoading}
-            />
+        <EditableJourneyMap 
+          checkInsHistory={dashboardData?.check_ins_history || []} 
+          isLoading={isLoading}
+        />
           </motion.div>
         </motion.div>
       </div>
