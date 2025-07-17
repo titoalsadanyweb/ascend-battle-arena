@@ -50,10 +50,10 @@ const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
       await checkIn({ status: 'victory' })
       setShowCelebration(true)
       // Force refetch immediately after check-in
-      await refetch()
-      setTimeout(() => {
+      setTimeout(async () => {
+        await refetch()
         setShowCelebration(false)
-      }, 2000)
+      }, 1500)
     } catch (error) {
       console.error('Check-in failed:', error)
     }

@@ -929,6 +929,16 @@ export type Database = {
         }
         Returns: Json
       }
+      handle_checkin_with_rls: {
+        Args: {
+          p_user_id: string
+          p_date_local: string
+          p_status: string
+          p_tokens_awarded: number
+          p_is_edit?: boolean
+        }
+        Returns: Json
+      }
       handle_quest_completion: {
         Args: {
           p_user_id: string

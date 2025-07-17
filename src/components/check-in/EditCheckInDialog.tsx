@@ -37,15 +37,21 @@ const EditCheckInDialog: React.FC<EditCheckInDialogProps> = ({
     setShowConfirmDialog(true)
   }
 
-  const confirmStatusChange = () => {
+  const confirmStatusChange = async () => {
     if (!selectedDate || !pendingStatus) return
-    checkIn({
-      status: pendingStatus,
-      date: selectedDate.toISOString().split('T')[0],
-      isEdit: true
-    })
-    setShowConfirmDialog(false)
-    setPendingStatus(null)
+    
+    try {
+      await checkIn({
+        status: pendingStatus,
+        date: selectedDate.toISOString().split('T')[0],
+        isEdit: true
+      })
+      setShowConfirmDialog(false)
+      setPendingStatus(null)
+      onOpenChange(false) // Close the main dialog after successful edit
+    } catch (error) {
+      console.error('Failed to update check-in:', error)
+    }
   }
 
   const getCheckInStatus = (date: Date) => {
