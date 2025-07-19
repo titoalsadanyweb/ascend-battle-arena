@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Flame, Trophy, Coins, Shield } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { motion } from 'framer-motion'
+import { useDashboard } from "@/lib/hooks/useDashboard"
 
 interface StatsOverviewProps {
   currentStreak: number
@@ -13,11 +14,20 @@ interface StatsOverviewProps {
 }
 
 const StatsOverview: React.FC<StatsOverviewProps> = ({
-  currentStreak,
-  bestStreak,
-  tokenBalance,
-  isLoading
+  currentStreak: propCurrentStreak,
+  bestStreak: propBestStreak,
+  tokenBalance: propTokenBalance,
+  isLoading: propIsLoading
 }) => {
+  const { dashboardData, isLoading: dashboardLoading } = useDashboard()
+
+  // Use dashboard data if available, otherwise fallback to props
+  const currentStreak = dashboardData?.current_streak ?? propCurrentStreak
+  const bestStreak = dashboardData?.best_streak ?? propBestStreak
+  const tokenBalance = dashboardData?.token_balance ?? propTokenBalance
+  const isLoading = dashboardLoading || propIsLoading
+
+  console.log('StatsOverview data:', { currentStreak, bestStreak, tokenBalance, isLoading })
   const stats = [
     {
       title: "VICTORY STREAK",

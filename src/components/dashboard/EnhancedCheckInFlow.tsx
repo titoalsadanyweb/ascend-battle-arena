@@ -14,15 +14,23 @@ interface EnhancedCheckInFlowProps {
 }
 
 const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
-  hasCheckedInToday,
-  currentStreak,
-  bestStreak,
-  tokenBalance
+  hasCheckedInToday: propHasCheckedIn,
+  currentStreak: propCurrentStreak,
+  bestStreak: propBestStreak,
+  tokenBalance: propTokenBalance
 }) => {
   const { checkIn, isCheckingIn } = useCheckIn()
-  const { refetch } = useDashboard()
+  const { dashboardData, refetch } = useDashboard()
   const [showCelebration, setShowCelebration] = useState(false)
   const [timeUntilNext, setTimeUntilNext] = useState('')
+
+  // Use dashboard data if available, otherwise fallback to props
+  const hasCheckedInToday = dashboardData?.has_checked_in_today ?? propHasCheckedIn
+  const currentStreak = dashboardData?.current_streak ?? propCurrentStreak
+  const bestStreak = dashboardData?.best_streak ?? propBestStreak
+  const tokenBalance = dashboardData?.token_balance ?? propTokenBalance
+
+  console.log('EnhancedCheckInFlow data:', { hasCheckedInToday, currentStreak, bestStreak, tokenBalance })
 
   // Calculate time until next check-in (next day at midnight)
   useEffect(() => {

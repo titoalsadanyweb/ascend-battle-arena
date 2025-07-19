@@ -62,8 +62,10 @@ export const useCheckIn = () => {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       queryClient.invalidateQueries({ queryKey: ['profile'] })
       
-      // Force refetch dashboard data
-      queryClient.refetchQueries({ queryKey: ['dashboard'] })
+      // Force immediate refetch of dashboard data
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['dashboard'] })
+      }, 100)
       
       // Show success toast with streak information
       const isNewRecord = data.current_streak === data.best_streak && data.current_streak > 1
