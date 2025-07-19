@@ -26,6 +26,8 @@ export const useDashboard = () => {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('No session')
 
+      console.log('Fetching dashboard data for user:', user.id)
+
       const response = await fetch(
         `https://aslozlmjcnxvwzskhtgy.supabase.co/functions/v1/dashboard`,
         {
@@ -39,13 +41,17 @@ export const useDashboard = () => {
 
       if (!response.ok) {
         const errorData = await response.json()
+        console.error('Dashboard fetch error:', errorData)
         throw new Error(errorData.error || 'Dashboard fetch failed')
       }
 
-      return response.json()
+      const data = await response.json()
+      console.log('Dashboard data received:', data)
+      return data
     },
     enabled: !!user && !authLoading,
-    staleTime: 2 * 60 * 1000, // Consider data fresh for 2 minutes
+    staleTime: 30 * 1000, // Consider data fresh for 30 seconds (shorter for more updates)
+    refetchOnWindowFocus: true,
     retry: (failureCount, error: any) => {
       if (error?.message?.includes('Unauthorized')) return false
       return failureCount < 2

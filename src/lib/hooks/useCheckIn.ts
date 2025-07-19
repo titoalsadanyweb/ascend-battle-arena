@@ -58,9 +58,12 @@ export const useCheckIn = () => {
     onSuccess: (data) => {
       console.log('Check-in successful:', data)
       
-      // Invalidate and refetch relevant queries
+      // Invalidate and refetch relevant queries immediately
       queryClient.invalidateQueries({ queryKey: ['dashboard'] })
       queryClient.invalidateQueries({ queryKey: ['profile'] })
+      
+      // Force refetch dashboard data
+      queryClient.refetchQueries({ queryKey: ['dashboard'] })
       
       // Show success toast with streak information
       const isNewRecord = data.current_streak === data.best_streak && data.current_streak > 1
