@@ -40,11 +40,20 @@ export const useCheckIn = () => {
       )
 
       if (!response.ok) {
-        const errorData = await response.json()
+        const errorText = await response.text()
+        console.error('Check-in error response:', errorText)
+        let errorData
+        try {
+          errorData = JSON.parse(errorText)
+        } catch {
+          errorData = { error: 'Check-in failed: ' + errorText }
+        }
         throw new Error(errorData.error || 'Check-in failed')
       }
 
-      return response.json()
+      const data = await response.json()
+      console.log('Check-in response data:', data)
+      return data
     },
     onSuccess: (data) => {
       console.log('Check-in successful:', data)

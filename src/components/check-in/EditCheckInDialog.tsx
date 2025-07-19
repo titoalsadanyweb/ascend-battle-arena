@@ -17,6 +17,7 @@ interface EditCheckInDialogProps {
   onOpenChange: (open: boolean) => void
   checkIns: Array<{
     date: string
+    date_local?: string
     status: 'victory' | 'defeat'
   }>
 }
@@ -56,7 +57,8 @@ const EditCheckInDialog: React.FC<EditCheckInDialogProps> = ({
 
   const getCheckInStatus = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0]
-    return checkIns.find(c => c.date === dateStr)?.status
+    const checkIn = checkIns.find(c => c.date === dateStr || c.date_local === dateStr)
+    return checkIn?.status
   }
 
   return (
