@@ -59,12 +59,13 @@ export const useCheckIn = () => {
       console.log('Check-in successful:', data)
       
       // Invalidate and refetch relevant queries immediately
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
-      queryClient.invalidateQueries({ queryKey: ['profile'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard', user?.id] })
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] })
       
       // Force immediate refetch of dashboard data
       setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ['dashboard'] })
+        queryClient.refetchQueries({ queryKey: ['dashboard', user?.id] })
+        queryClient.refetchQueries({ queryKey: ['profile', user?.id] })
       }, 100)
       
       // Show success toast with streak information

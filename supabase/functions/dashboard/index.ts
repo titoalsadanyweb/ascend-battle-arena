@@ -13,6 +13,8 @@ serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization') || ''
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -20,12 +22,14 @@ serve(async (req) => {
         auth: {
           autoRefreshToken: false,
           persistSession: false
+        },
+        global: {
+          headers: { Authorization: authHeader }
         }
       }
     )
 
-    // Get the Authorization header and extract the user
-    const authHeader = req.headers.get('Authorization')
+    // Validate auth header and extract the user
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'No authorization header' }), { 
         status: 401,
