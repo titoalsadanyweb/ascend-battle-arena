@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -828,91 +828,91 @@ export type Database = {
         Returns: boolean
       }
       check_daily_swap_limit: {
-        Args: { p_user_id: string; p_date_local: string }
+        Args: { p_date_local: string; p_user_id: string }
         Returns: boolean
       }
       complete_regroup_mission: {
         Args: {
-          p_user_id: string
           p_mission_id: string
           p_reflection_text: string
+          p_user_id: string
         }
         Returns: Json
       }
       create_commitment: {
         Args: {
-          p_user_id: string
           p_ally_id: string
           p_duration: number
           p_stake_amount: number
+          p_user_id: string
         }
         Returns: Json
       }
       create_commitment_with_ally_stake: {
         Args: {
-          p_user_id: string
           p_ally_id: string
-          p_duration: number
-          p_user_stake: number
           p_ally_stake?: number
+          p_duration: number
+          p_user_id: string
+          p_user_stake: number
         }
         Returns: Json
       }
       create_regroup_mission: {
         Args: {
-          p_user_id: string
           p_failed_commitment_id: string
           p_lost_tokens: number
+          p_user_id: string
         }
         Returns: Json
       }
       find_potential_allies: {
-        Args: { p_user_id: string; p_limit?: number }
+        Args: { p_limit?: number; p_user_id: string }
         Returns: {
-          user_id: string
-          username: string
-          language: string
-          secondary_language: string
-          religion: string
+          best_streak: number
           bio: string
           current_streak: number
-          best_streak: number
-          timezone: string
+          language: string
           match_score: number
+          religion: string
+          secondary_language: string
+          timezone: string
+          user_id: string
+          username: string
         }[]
       }
       get_active_commitments: {
         Args: { p_user_id: string }
         Returns: {
-          id: string
-          user_id: string
           ally_id: string
-          start_date: string
-          end_date: string
-          duration_days: number
-          stake_amount: number
-          status: string
           created_at: string
           description: string
+          duration_days: number
+          end_date: string
           failure_count: number
+          id: string
+          stake_amount: number
+          start_date: string
+          status: string
           success_streak: number
+          user_id: string
         }[]
       }
       get_user_commitments: {
         Args: { p_user_id: string }
         Returns: {
-          id: string
-          user_id: string
           ally_id: string
-          start_date: string
-          end_date: string
-          duration_days: number
-          stake_amount: number
-          status: string
           created_at: string
           description: string
+          duration_days: number
+          end_date: string
           failure_count: number
+          id: string
+          stake_amount: number
+          start_date: string
+          status: string
           success_streak: number
+          user_id: string
         }[]
       }
       get_user_token_balance: {
@@ -921,54 +921,54 @@ export type Database = {
       }
       handle_checkin_transaction: {
         Args: {
-          p_user_id: string
+          p_best_streak: number
           p_date_local: string
           p_new_streak: number
           p_tokens_awarded: number
-          p_best_streak: number
+          p_user_id: string
         }
         Returns: Json
       }
       handle_checkin_with_rls: {
         Args: {
-          p_user_id: string
           p_date_local: string
+          p_is_edit?: boolean
           p_status: string
           p_tokens_awarded: number
-          p_is_edit?: boolean
+          p_user_id: string
         }
         Returns: Json
       }
       handle_quest_completion: {
         Args: {
-          p_user_id: string
-          p_quest_id: string
           p_date_local: string
+          p_quest_id: string
+          p_shared_with_ally: boolean
           p_submission_text: string
           p_tokens_awarded: number
-          p_shared_with_ally: boolean
+          p_user_id: string
         }
         Returns: undefined
       }
       handle_quest_completion_with_session: {
         Args: {
-          p_user_id: string
-          p_quest_id: string
           p_date_local: string
+          p_energy_selected?: string
+          p_mood_selected?: string
+          p_quest_id: string
+          p_shared_with_ally: boolean
           p_submission_text: string
           p_tokens_awarded: number
-          p_shared_with_ally: boolean
-          p_mood_selected?: string
-          p_energy_selected?: string
+          p_user_id: string
         }
         Returns: Json
       }
       handle_quest_session: {
         Args: {
-          p_user_id: string
-          p_quest_id: string
-          p_date_local: string
           p_action?: string
+          p_date_local: string
+          p_quest_id: string
+          p_user_id: string
         }
         Returns: Json
       }
@@ -985,7 +985,7 @@ export type Database = {
         Returns: Json
       }
       update_token_balance: {
-        Args: { p_user_id: string; p_amount: number }
+        Args: { p_amount: number; p_user_id: string }
         Returns: undefined
       }
     }
