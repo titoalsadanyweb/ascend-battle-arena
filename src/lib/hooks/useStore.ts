@@ -10,8 +10,11 @@ export interface StoreItem {
   cost: number
   category: 'avatar' | 'theme' | 'badge' | 'special' | 'armor' | 'weapon'
   rarity: 'common' | 'rare' | 'epic' | 'legendary'
-  icon_name: string | null
-  requirements: any
+  icon_name: string
+  requirements: {
+    streak?: number
+    achievements?: string[]
+  }
   is_active: boolean
   owned?: boolean
 }
@@ -24,29 +27,54 @@ export interface UserPurchase {
   store_item?: StoreItem
 }
 
-export const useStore = () => {
+export const useStoreItems = () => {
   const { user } = useAuth()
-  const queryClient = useQueryClient()
 
-  // Fetch all store items
-  const storeItemsQuery = useQuery({
-    queryKey: ['store-items'],
+  return useQuery({
+    queryKey: ['store-items', user?.id],
     queryFn: async (): Promise<StoreItem[]> => {
-      const { data, error } = await supabase
+      // Get all store items
+      const { data: items, error: itemsError } = await supabase
         .from('store_items')
         .select('*')
         .eq('is_active', true)
-        .order('category', { ascending: true })
-        .order('cost', { ascending: true })
+        .order('category, cost')
 
-      if (error) throw error
-      return (data as StoreItem[]) || []
+      if (itemsError) throw itemsError
+
+      if (!user) {
+        return items.map(item => ({
+          ...item,
+          requirements: item.requirements as any || {},
+          owned: false
+        })) as StoreItem[]
+      }
+
+      // Get user purchases to mark owned items
+      const { data: purchases, error: purchasesError } = await supabase
+        .from('user_purchases')
+        .select('store_item_id')
+        .eq('user_id', user.id)
+
+      if (purchasesError) throw purchasesError
+
+      const ownedItemIds = new Set(purchases.map(p => p.store_item_id))
+
+      return items.map(item => ({
+        ...item,
+        requirements: item.requirements as any || {},
+        owned: ownedItemIds.has(item.id)
+      })) as StoreItem[]
     },
+    enabled: true,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
+}
 
-  // Fetch user's purchases
-  const userPurchasesQuery = useQuery({
+export const useUserPurchases = () => {
+  const { user } = useAuth()
+
+  return useQuery({
     queryKey: ['user-purchases', user?.id],
     queryFn: async (): Promise<UserPurchase[]> => {
       if (!user) return []
@@ -58,23 +86,30 @@ export const useStore = () => {
           store_item:store_items(*)
         `)
         .eq('user_id', user.id)
+        .order('purchased_at', { ascending: false })
 
       if (error) throw error
-      return (data as UserPurchase[]) || []
+      return (data || []) as UserPurchase[]
     },
     enabled: !!user,
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 5 * 60 * 1000,
   })
+}
 
-  // Purchase mutation
-  const purchaseMutation = useMutation({
+export const usePurchaseItem = () => {
+  const queryClient = useQueryClient()
+  const { user } = useAuth()
+
+  return useMutation({
     mutationFn: async (itemId: string) => {
+      if (!user) throw new Error('Not authenticated')
+
       const { data, error } = await supabase.rpc('purchase_store_item', {
         p_item_id: itemId
       })
 
       if (error) throw error
-
+      
       const result = data as any
       if (result?.error) {
         throw new Error(result.error)
@@ -82,13 +117,15 @@ export const useStore = () => {
 
       return result
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['store-items'] })
       queryClient.invalidateQueries({ queryKey: ['user-purchases'] })
       queryClient.invalidateQueries({ queryKey: ['profile'] })
-      
+
       toast({
-        title: "Purchase Successful! 🎉",
-        description: `You've unlocked ${data.item_name}`,
+        title: "Purchase Successful!",
+        description: `You've unlocked ${(data as any)?.item_name} for ${(data as any)?.cost} SIT`,
       })
     },
     onError: (error: Error) => {
@@ -99,19 +136,4 @@ export const useStore = () => {
       })
     },
   })
-
-  // Merge store items with ownership info
-  const itemsWithOwnership = storeItemsQuery.data?.map(item => ({
-    ...item,
-    owned: userPurchasesQuery.data?.some(purchase => purchase.store_item_id === item.id) || false
-  })) || []
-
-  return {
-    storeItems: itemsWithOwnership,
-    userPurchases: userPurchasesQuery.data || [],
-    isLoading: storeItemsQuery.isLoading || userPurchasesQuery.isLoading,
-    purchaseItem: purchaseMutation.mutate,
-    isPurchasing: purchaseMutation.isPending,
-    error: storeItemsQuery.error || userPurchasesQuery.error,
-  }
 }

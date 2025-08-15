@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useProfile } from '@/lib/hooks/useProfile'
-import { useStore } from '@/lib/hooks/useStore'
+import { useStoreItems, useUserPurchases, usePurchaseItem } from '@/lib/hooks/useStore'
 import { Separator } from '@/components/ui/separator'
 
 const getIconComponent = (iconName: string | null) => {
@@ -42,7 +42,9 @@ const getIconComponent = (iconName: string | null) => {
 
 const EnhancedTokenStore: React.FC = () => {
   const { profile } = useProfile()
-  const { storeItems, userPurchases, purchaseItem, isPurchasing, isLoading } = useStore()
+  const { data: storeItems, isLoading } = useStoreItems()
+  const { data: userPurchases } = useUserPurchases()
+  const purchaseItemMutation = usePurchaseItem()
   const [activeTab, setActiveTab] = useState('avatar')
 
   const getRarityColor = (rarity: string) => {
@@ -62,8 +64,8 @@ const EnhancedTokenStore: React.FC = () => {
     return true
   }
 
-  const filteredItems = storeItems.filter(item => item.category === activeTab)
-  const ownedItems = userPurchases.filter(purchase => purchase.store_item?.category === activeTab)
+  const filteredItems = storeItems?.filter(item => item.category === activeTab) || []
+  const ownedItems = userPurchases?.filter(purchase => purchase.store_item?.category === activeTab) || []
 
   if (isLoading) {
     return (
@@ -216,8 +218,8 @@ const EnhancedTokenStore: React.FC = () => {
                         </div>
                         
                         <Button
-                          onClick={() => purchaseItem(item.id)}
-                          disabled={!canPurchase(item) || isPurchasing}
+                          onClick={() => purchaseItemMutation.mutate(item.id)}
+                          disabled={!canPurchase(item) || purchaseItemMutation.isPending}
                           variant={item.owned ? "secondary" : "default"}
                           size="sm"
                         >
@@ -228,7 +230,7 @@ const EnhancedTokenStore: React.FC = () => {
                               <Lock className="h-3 w-3" />
                               Locked
                             </div>
-                          ) : isPurchasing ? (
+                          ) : purchaseItemMutation.isPending ? (
                             "Purchasing..."
                           ) : (
                             "Purchase"

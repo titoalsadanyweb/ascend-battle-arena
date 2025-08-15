@@ -4,94 +4,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Coins, Shirt, Palette, Crown, Shield, Star, Lock } from 'lucide-react'
+import { Skeleton } from "@/components/ui/skeleton"
+import { 
+  Coins, Shirt, Palette, Crown, Shield, Star, Lock, 
+  Zap, Heart, Sword, Axe, Award, Gem, Feather, Package 
+} from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useProfile } from '@/lib/hooks/useProfile'
-import { toast } from '@/hooks/use-toast'
+import { useStoreItems, usePurchaseItem, StoreItem } from '@/lib/hooks/useStore'
+import OwnedItemsSection from './OwnedItemsSection'
 
-interface StoreItem {
-  id: string
-  name: string
-  description: string
-  cost: number
-  category: 'avatar' | 'theme' | 'badge' | 'special'
-  rarity: 'common' | 'rare' | 'epic' | 'legendary'
-  icon: React.ReactNode
-  requirements?: {
-    streak?: number
-    achievements?: string[]
+const getIconComponent = (iconName: string) => {
+  const iconMap: Record<string, React.ReactNode> = {
+    crown: <Crown className="h-6 w-6" />,
+    shield: <Shield className="h-6 w-6" />,
+    star: <Star className="h-6 w-6" />,
+    zap: <Zap className="h-6 w-6" />,
+    heart: <Heart className="h-6 w-6" />,
+    sword: <Sword className="h-6 w-6" />,
+    axe: <Axe className="h-6 w-6" />,
+    award: <Award className="h-6 w-6" />,
+    palette: <Palette className="h-6 w-6" />,
+    gem: <Gem className="h-6 w-6" />,
+    feather: <Feather className="h-6 w-6" />,
   }
-  owned?: boolean
+  return iconMap[iconName] || <Package className="h-6 w-6" />
 }
 
 const TokenStore: React.FC = () => {
   const { profile } = useProfile()
+  const { data: storeItems, isLoading, error } = useStoreItems()
+  const purchaseItem = usePurchaseItem()
   const [activeTab, setActiveTab] = useState('avatar')
-
-  const storeItems: StoreItem[] = [
-    // Avatar Themes
-    {
-      id: 'warrior_theme',
-      name: 'Warrior Theme',
-      description: 'Classic warrior avatar with armor',
-      cost: 50,
-      category: 'avatar',
-      rarity: 'common',
-      icon: <Shield className="h-6 w-6" />
-    },
-    {
-      id: 'champion_theme',
-      name: 'Champion Theme',
-      description: 'Golden champion avatar with crown',
-      cost: 150,
-      category: 'avatar',
-      rarity: 'rare',
-      icon: <Crown className="h-6 w-6" />,
-      requirements: { streak: 7 }
-    },
-    {
-      id: 'legend_theme',
-      name: 'Legend Theme',
-      description: 'Legendary avatar with special effects',
-      cost: 500,
-      category: 'avatar',
-      rarity: 'legendary',
-      icon: <Star className="h-6 w-6" />,
-      requirements: { streak: 30 }
-    },
-    
-    // Dashboard Themes
-    {
-      id: 'dark_theme',
-      name: 'Dark Mode Theme',
-      description: 'Sleek dark dashboard theme',
-      cost: 25,
-      category: 'theme',
-      rarity: 'common',
-      icon: <Palette className="h-6 w-6" />
-    },
-    {
-      id: 'golden_theme',
-      name: 'Golden Theme',
-      description: 'Luxury golden dashboard theme',
-      cost: 200,
-      category: 'theme',
-      rarity: 'epic',
-      icon: <Palette className="h-6 w-6" />,
-      requirements: { streak: 14 }
-    },
-    
-    // Special Items
-    {
-      id: 'streak_protection',
-      name: 'Streak Protection',
-      description: 'One-time protection against streak loss',
-      cost: 100,
-      category: 'special',
-      rarity: 'rare',
-      icon: <Shield className="h-6 w-6" />
-    }
-  ]
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
@@ -112,15 +56,50 @@ const TokenStore: React.FC = () => {
 
   const handlePurchase = (item: StoreItem) => {
     if (!canPurchase(item)) return
-    
-    // In real app, this would call an API to purchase the item
-    toast({
-      title: "Purchase Successful!",
-      description: `You've unlocked ${item.name}`,
-    })
+    purchaseItem.mutate(item.id)
   }
 
-  const filteredItems = storeItems.filter(item => item.category === activeTab)
+  const filteredItems = storeItems?.filter(item => item.category === activeTab) || []
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Valor Shards Store</h2>
+            <p className="text-muted-foreground">Customize your battle experience</p>
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-24" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <Package className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+        <h3 className="font-medium text-muted-foreground mb-2">Error loading store</h3>
+        <p className="text-sm text-muted-foreground">
+          Please try refreshing the page
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -138,10 +117,18 @@ const TokenStore: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="avatar" className="gap-2">
             <Shirt className="h-4 w-4" />
             Avatars
+          </TabsTrigger>
+          <TabsTrigger value="armor" className="gap-2">
+            <Shield className="h-4 w-4" />
+            Armor
+          </TabsTrigger>
+          <TabsTrigger value="weapon" className="gap-2">
+            <Sword className="h-4 w-4" />
+            Weapons
           </TabsTrigger>
           <TabsTrigger value="theme" className="gap-2">
             <Palette className="h-4 w-4" />
@@ -155,7 +142,15 @@ const TokenStore: React.FC = () => {
             <Crown className="h-4 w-4" />
             Special
           </TabsTrigger>
+          <TabsTrigger value="owned" className="gap-2">
+            <Package className="h-4 w-4" />
+            Owned
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="owned" className="mt-6">
+          <OwnedItemsSection />
+        </TabsContent>
 
         <TabsContent value={activeTab} className="mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -173,7 +168,7 @@ const TokenStore: React.FC = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${getRarityColor(item.rarity)}`}>
-                          {item.icon}
+                          {getIconComponent(item.icon_name)}
                         </div>
                         <div>
                           <CardTitle className="text-lg">{item.name}</CardTitle>
@@ -191,7 +186,7 @@ const TokenStore: React.FC = () => {
                   <CardContent className="space-y-4">
                     <CardDescription>{item.description}</CardDescription>
                     
-                    {item.requirements && (
+                    {item.requirements && Object.keys(item.requirements).length > 0 && (
                       <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
                         <h4 className="text-sm font-medium text-amber-800 mb-1">Requirements:</h4>
                         {item.requirements.streak && (
@@ -212,10 +207,12 @@ const TokenStore: React.FC = () => {
                       
                       <Button
                         onClick={() => handlePurchase(item)}
-                        disabled={!canPurchase(item)}
+                        disabled={!canPurchase(item) || purchaseItem.isPending}
                         variant={item.owned ? "secondary" : "default"}
                       >
-                        {item.owned ? (
+                        {purchaseItem.isPending ? (
+                          "Purchasing..."
+                        ) : item.owned ? (
                           "Owned"
                         ) : !canPurchase(item) ? (
                           <div className="flex items-center gap-1">
@@ -233,7 +230,7 @@ const TokenStore: React.FC = () => {
             ))}
           </div>
           
-          {filteredItems.length === 0 && (
+          {filteredItems.length === 0 && activeTab !== 'owned' && (
             <div className="text-center py-12">
               <Coins className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
               <h3 className="font-medium text-muted-foreground mb-2">No items available</h3>
