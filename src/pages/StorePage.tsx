@@ -3,7 +3,7 @@ import React from 'react'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { motion } from 'framer-motion'
 import { Coins } from 'lucide-react'
-import TokenStore from '@/components/store/TokenStore'
+import EnhancedTokenStore from '@/components/store/EnhancedTokenStore'
 
 const StorePage: React.FC = () => {
   return (
@@ -32,7 +32,7 @@ const StorePage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          <TokenStore />
+          <EnhancedTokenStore />
         </motion.div>
       </div>
     </AppLayout>

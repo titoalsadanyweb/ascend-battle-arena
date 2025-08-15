@@ -715,6 +715,48 @@ export type Database = {
         }
         Relationships: []
       }
+      store_items: {
+        Row: {
+          category: string
+          cost: number
+          created_at: string
+          description: string
+          icon_name: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          rarity: string
+          requirements: Json | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          cost: number
+          created_at?: string
+          description: string
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          rarity?: string
+          requirements?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          cost?: number
+          created_at?: string
+          description?: string
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          rarity?: string
+          requirements?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       token_transactions: {
         Row: {
           amount: number
@@ -795,6 +837,42 @@ export type Database = {
           },
           {
             foreignKeyName: "user_achievements_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_purchases: {
+        Row: {
+          id: string
+          purchased_at: string
+          store_item_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          purchased_at?: string
+          store_item_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          purchased_at?: string
+          store_item_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_purchases_store_item_id_fkey"
+            columns: ["store_item_id"]
+            isOneToOne: false
+            referencedRelation: "store_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_purchases_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -975,6 +1053,10 @@ export type Database = {
       process_commitment_checkins: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      purchase_store_item: {
+        Args: { p_item_id: string }
+        Returns: Json
       }
       resolve_commitment_with_penalty_escalation: {
         Args: { p_commitment_id: string }
