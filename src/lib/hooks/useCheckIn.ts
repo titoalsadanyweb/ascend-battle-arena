@@ -7,6 +7,9 @@ interface CheckInOptions {
   status: 'victory' | 'defeat'
   date?: string
   isEdit?: boolean
+  mood?: string
+  energy?: string
+  reflection?: string
 }
 
 export const useCheckIn = () => {
@@ -14,7 +17,7 @@ export const useCheckIn = () => {
   const queryClient = useQueryClient()
 
   const checkInMutation = useMutation({
-    mutationFn: async ({ status, date, isEdit }: CheckInOptions) => {
+    mutationFn: async ({ status, date, isEdit, mood, energy, reflection }: CheckInOptions) => {
       if (!user) throw new Error('Not authenticated')
       
       const { data: { session } } = await supabase.auth.getSession()
@@ -34,7 +37,10 @@ export const useCheckIn = () => {
             user_id: user.id,
             status,
             date,
-            is_edit: isEdit
+            is_edit: isEdit,
+            mood,
+            energy,
+            reflection
           })
         }
       )

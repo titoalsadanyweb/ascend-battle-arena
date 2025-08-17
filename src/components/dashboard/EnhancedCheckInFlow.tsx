@@ -4,7 +4,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useCheckIn } from "@/lib/hooks/useCheckIn"
 import { useDashboard } from "@/lib/hooks/useDashboard"
-import { Shield, CheckCircle, Clock, Flame } from 'lucide-react'
+import { Shield, CheckCircle, Clock, Flame, Plus } from 'lucide-react'
+import EnhancedCheckInModal from '@/components/check-in/EnhancedCheckInModal'
+import StreakRecoveryCard from '@/components/check-in/StreakRecoveryCard'
 
 interface EnhancedCheckInFlowProps {
   hasCheckedInToday: boolean
@@ -23,6 +25,7 @@ const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
   const { dashboardData, refetch } = useDashboard()
   const [showCelebration, setShowCelebration] = useState(false)
   const [timeUntilNext, setTimeUntilNext] = useState('')
+  const [showCheckInModal, setShowCheckInModal] = useState(false)
 
   // Use dashboard data if available, otherwise fallback to props
   const hasCheckedInToday = dashboardData?.has_checked_in_today ?? propHasCheckedIn
@@ -67,8 +70,28 @@ const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
     }
   }
 
+  const handleCheckInSuccess = () => {
+    setShowCelebration(true)
+    // Force refetch immediately after check-in
+    setTimeout(async () => {
+      await refetch()
+      setShowCelebration(false)
+    }, 1500)
+  }
+
+  const isStreakBroken = currentStreak === 0 && bestStreak > 0
+
   return (
     <div className="space-y-4">
+      {/* Recovery Card - Show when streak is broken or rebuilding */}
+      {(isStreakBroken || (currentStreak > 0 && currentStreak < bestStreak)) && (
+        <StreakRecoveryCard
+          currentStreak={currentStreak}
+          bestStreak={bestStreak}
+          onStartRecovery={() => setShowCheckInModal(true)}
+        />
+      )}
+
       {/* Celebration Animation */}
       <AnimatePresence>
         {showCelebration && (
@@ -127,7 +150,7 @@ const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
                 <p className="text-muted-foreground">
                   {hasCheckedInToday 
                     ? `Day ${currentStreak} complete • Next in ${timeUntilNext}`
-                    : 'Claim your daily progress'
+                    : 'Track your daily progress with mood and energy'
                   }
                 </p>
               </div>
@@ -161,30 +184,14 @@ const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
             ) : (
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
-                  onClick={handleCheckIn}
-                  disabled={isCheckingIn}
+                  onClick={() => setShowCheckInModal(true)}
                   size="lg"
                   className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg"
                 >
-                  {isCheckingIn ? (
-                    <motion.div 
-                      className="flex items-center gap-3"
-                      animate={{ opacity: [1, 0.7, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      <motion.div 
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      />
-                      Declaring Victory...
-                    </motion.div>
-                  ) : (
-                    <div className="flex items-center gap-3">
-                      <Shield className="h-5 w-5" />
-                      Declare Victory Today
-                    </div>
-                  )}
+                  <div className="flex items-center gap-3">
+                    <Plus className="h-5 w-5" />
+                    Enhanced Check-in
+                  </div>
                 </Button>
               </motion.div>
             )}
@@ -197,6 +204,14 @@ const EnhancedCheckInFlow: React.FC<EnhancedCheckInFlowProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Enhanced Check-in Modal */}
+      <EnhancedCheckInModal
+        isOpen={showCheckInModal}
+        onClose={() => setShowCheckInModal(false)}
+        onSuccess={handleCheckInSuccess}
+        currentStreak={currentStreak}
+      />
     </div>
   )
 }

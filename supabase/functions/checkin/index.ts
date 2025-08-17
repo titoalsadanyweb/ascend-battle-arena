@@ -44,7 +44,7 @@ serve(async (req) => {
     }
 
     const requestData = await req.json()
-    const { status, date, is_edit } = requestData
+    const { status, date, is_edit, mood, energy, reflection } = requestData
     const user_id = user.id
   
     if (!status) {
