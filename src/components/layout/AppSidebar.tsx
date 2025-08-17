@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar"
 import { useAuth } from '@/lib/AuthProvider'
 import { useProfile } from '@/lib/hooks/useProfile'
-import { Shield, User, Users, BookOpen, Swords, MessageCircle } from 'lucide-react'
+import { Shield, User, Users, BookOpen, Swords, MessageCircle, Store } from 'lucide-react'
 
 const AppSidebar = () => {
   const { user } = useAuth()
@@ -38,6 +38,11 @@ const AppSidebar = () => {
       title: "Community Feed",
       url: "/community",
       icon: MessageCircle,
+    },
+    {
+      title: "Valor Shards Store",
+      url: "/store",
+      icon: Store,
     },
     {
       title: "Battle Profile",

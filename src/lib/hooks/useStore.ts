@@ -122,6 +122,7 @@ export const usePurchaseItem = () => {
       queryClient.invalidateQueries({ queryKey: ['store-items'] })
       queryClient.invalidateQueries({ queryKey: ['user-purchases'] })
       queryClient.invalidateQueries({ queryKey: ['profile'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
 
       toast({
         title: "Purchase Successful!",
