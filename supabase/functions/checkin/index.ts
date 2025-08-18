@@ -100,6 +100,19 @@ serve(async (req) => {
       p_is_edit: is_edit || false
     })
 
+    // If we have mood/energy data, update the check-in record
+    if (checkInError === null && result && !result.error && (mood || energy || reflection)) {
+      const { error: updateError } = await supabase
+        .from('check_ins')
+        .update({
+          mood_selected: mood,
+          energy_selected: energy,
+          reflection_text: reflection
+        })
+        .eq('user_id', user_id)
+        .eq('date_local', targetDate)
+    }
+
     if (checkInError) {
       console.error('Check-in database error:', checkInError)
       return new Response(JSON.stringify({ 

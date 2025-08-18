@@ -225,8 +225,11 @@ export type Database = {
         Row: {
           created_at: string
           date_local: string
+          energy_selected: string | null
           id: string
           is_edited: boolean | null
+          mood_selected: string | null
+          reflection_text: string | null
           status: string
           tokens_awarded: number
           user_id: string
@@ -234,8 +237,11 @@ export type Database = {
         Insert: {
           created_at?: string
           date_local: string
+          energy_selected?: string | null
           id?: string
           is_edited?: boolean | null
+          mood_selected?: string | null
+          reflection_text?: string | null
           status: string
           tokens_awarded: number
           user_id: string
@@ -243,8 +249,11 @@ export type Database = {
         Update: {
           created_at?: string
           date_local?: string
+          energy_selected?: string | null
           id?: string
           is_edited?: boolean | null
+          mood_selected?: string | null
+          reflection_text?: string | null
           status?: string
           tokens_awarded?: number
           user_id?: string
