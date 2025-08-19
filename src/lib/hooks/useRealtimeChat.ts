@@ -50,13 +50,20 @@ export const useRealtimeChat = (allyId: string | null): UseRealtimeChatReturn =>
           image_url,
           created_at
         `)
-        .or(`and(sender_id.eq.${user.id},receiver_id.eq.${allyId}),and(sender_id.eq.${allyId},receiver_id.eq.${user.id})`)
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .or(`sender_id.eq.${allyId},receiver_id.eq.${allyId}`)
         .order('created_at', { ascending: true })
 
       if (error) throw error
 
+      // Filter messages to only include conversation between user and ally
+      const filteredMessages = messagesData.filter(msg => 
+        (msg.sender_id === user.id && msg.receiver_id === allyId) ||
+        (msg.sender_id === allyId && msg.receiver_id === user.id)
+      )
+
       // Get usernames for messages
-      const userIds = Array.from(new Set([...messagesData.map(m => m.sender_id), allyId, user.id]))
+      const userIds = Array.from(new Set([...filteredMessages.map(m => m.sender_id), allyId, user.id]))
       const { data: profiles } = await supabase
         .from('profiles')
         .select('id, username')
@@ -67,7 +74,7 @@ export const useRealtimeChat = (allyId: string | null): UseRealtimeChatReturn =>
         return acc
       }, {} as Record<string, string>) || {}
 
-      const messagesWithUsernames = messagesData.map(msg => ({
+      const messagesWithUsernames = filteredMessages.map(msg => ({
         ...msg,
         sender_username: profileMap[msg.sender_id] || 'Unknown'
       }))
@@ -167,17 +174,22 @@ export const useRealtimeChat = (allyId: string | null): UseRealtimeChatReturn =>
     loadMessages()
 
     const channel = supabase
-      .channel('chat-messages')
+      .channel(`chat-${user.id}-${allyId}`)
       .on(
         'postgres_changes',
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'chat_messages',
-          filter: `or(and(sender_id.eq.${user.id},receiver_id.eq.${allyId}),and(sender_id.eq.${allyId},receiver_id.eq.${user.id}))`
+          table: 'chat_messages'
         },
         async (payload) => {
           const newMessage = payload.new as ChatMessage
+
+          // Only process messages in this conversation
+          if (!((newMessage.sender_id === user.id && newMessage.receiver_id === allyId) ||
+                (newMessage.sender_id === allyId && newMessage.receiver_id === user.id))) {
+            return
+          }
 
           // Get sender username
           const { data: profile } = await supabase
