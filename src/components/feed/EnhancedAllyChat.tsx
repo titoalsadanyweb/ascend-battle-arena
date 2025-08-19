@@ -10,30 +10,26 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { formatDistanceToNow } from 'date-fns'
 import { useAuth } from '@/lib/AuthProvider'
 import { useToast } from '@/hooks/use-toast'
+import { useRealtimeChat } from '@/lib/hooks/useRealtimeChat'
 import ChatImageUpload from './ChatImageUpload'
-
-interface ChatMessage {
-  id: string
-  sender_id: string
-  sender_username: string
-  message: string
-  image?: string
-  created_at: string
-}
 
 interface EnhancedAllyChatProps {
   selectedAllyId?: string
 }
 
 const EnhancedAllyChat: React.FC<EnhancedAllyChatProps> = ({ selectedAllyId }) => {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
   const [newMessage, setNewMessage] = useState('')
   const [selectedImage, setSelectedImage] = useState<{ file: File; preview: string } | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSending, setIsSending] = useState(false)
   const { user } = useAuth()
   const { toast } = useToast()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  const {
+    messages,
+    isLoading,
+    isSending,
+    sendMessage
+  } = useRealtimeChat(selectedAllyId || null)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -43,64 +39,15 @@ const EnhancedAllyChat: React.FC<EnhancedAllyChatProps> = ({ selectedAllyId }) =
     scrollToBottom()
   }, [messages])
 
-  useEffect(() => {
-    // Load messages for the selected ally
-    const timer = setTimeout(() => {
-      if (selectedAllyId) {
-        setMessages([
-          {
-            id: '1',
-            sender_id: 'ally-1',
-            sender_username: selectedAllyId,
-            message: 'Great work on your 5-day streak! Keep pushing forward! 💪',
-            created_at: new Date(Date.now() - 3600000).toISOString()
-          },
-          {
-            id: '2',
-            sender_id: user?.id || 'current-user',
-            sender_username: 'You',
-            message: 'Thanks! Your support means everything. How was your quest today?',
-            created_at: new Date(Date.now() - 1800000).toISOString()
-          }
-        ])
-      }
-      setIsLoading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [selectedAllyId, user?.id])
-
   const handleSendMessage = async () => {
     if ((!newMessage.trim() && !selectedImage) || isSending) return
 
-    setIsSending(true)
-    try {
-      const newMsg: ChatMessage = {
-        id: Date.now().toString(),
-        sender_id: user?.id || 'current-user',
-        sender_username: 'You',
-        message: newMessage.trim(),
-        image: selectedImage?.preview,
-        created_at: new Date().toISOString()
-      }
-
-      setMessages(prev => [...prev, newMsg])
-      setNewMessage('')
-      setSelectedImage(null)
-      
-      toast({
-        title: "Message Sent",
-        description: `Your message has been delivered to ${selectedAllyId}.`,
-      })
-    } catch (error) {
-      toast({
-        title: "Message Failed",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive"
-      })
-    } finally {
-      setIsSending(false)
-    }
+    await sendMessage({ 
+      message: newMessage,
+      image: selectedImage?.file
+    })
+    setNewMessage('')
+    setSelectedImage(null)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -177,15 +124,15 @@ const EnhancedAllyChat: React.FC<EnhancedAllyChatProps> = ({ selectedAllyId }) =
                       </Badge>
                     )}
                   </div>
-                  {message.image && (
-                    <div className="mb-2">
-                      <img
-                        src={message.image}
-                        alt="Shared"
-                        className="max-w-full h-auto rounded-md"
-                      />
-                    </div>
-                  )}
+                   {message.image_url && (
+                     <div className="mb-2">
+                       <img
+                         src={message.image_url}
+                         alt="Shared"
+                         className="max-w-full h-auto rounded-md"
+                       />
+                     </div>
+                   )}
                   {message.message && (
                     <p className="text-sm mb-1">{message.message}</p>
                   )}
