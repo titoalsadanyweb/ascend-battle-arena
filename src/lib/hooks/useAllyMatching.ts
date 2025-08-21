@@ -16,6 +16,10 @@ export interface PotentialAlly {
   timezone: string
   match_score: number
   country?: string | null
+  interests?: string[]
+  age_group?: string
+  trust_score?: number
+  compatibility_reasons?: string[]
 }
 
 export interface AllyInvitation {
@@ -70,7 +74,11 @@ export const useAllyMatching = () => {
         best_streak: ally.best_streak,
         timezone: ally.timezone || 'UTC',
         match_score: ally.match_score,
-        country: null // Will be added when we update the function
+        country: ally.country,
+        interests: ally.interests || [],
+        age_group: ally.age_group,
+        trust_score: ally.trust_score,
+        compatibility_reasons: ally.compatibility_reasons || []
       }))
     },
     enabled: !!user,

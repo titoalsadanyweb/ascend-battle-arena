@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Users, Search, MessageCircle, UserPlus, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
-import PotentialAlliesList from './PotentialAlliesList'
+import SmartAllyMatching from './SmartAllyMatching'
 import InvitationsPanel from './InvitationsPanel'
 import { useAllies } from '@/lib/hooks/useAllies'
 
@@ -39,34 +39,30 @@ const EnhancedAllyPanel: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="discover" className="gap-2">
             <Sparkles className="h-4 w-4" />
-            Discover
+            Discovery Center
           </TabsTrigger>
           <TabsTrigger value="invitations" className="gap-2">
             <MessageCircle className="h-4 w-4" />
             Invitations
           </TabsTrigger>
-          <TabsTrigger value="direct" className="gap-2">
-            <Search className="h-4 w-4" />
-            Direct Invite
-          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="discover" className="space-y-6 mt-6">
+        <TabsContent value="discover" className="mt-6">
           <Card className="border-primary/20 bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-primary">
                 <Sparkles className="h-5 w-5" />
-                Recommended Battle Allies
+                Smart Battle Ally Matching
               </CardTitle>
               <CardDescription>
-                AI-matched allies based on language, beliefs, and compatibility
+                AI-powered compatibility analysis finds your perfect accountability partner
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <PotentialAlliesList onInviteSent={() => setActiveTab('invitations')} />
+              <SmartAllyMatching onInviteSent={() => setActiveTab('invitations')} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -88,56 +84,6 @@ const EnhancedAllyPanel: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="direct" className="space-y-6 mt-6">
-          <Card className="border-primary/20 bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <UserPlus className="h-5 w-5" />
-                Direct Battle Ally Invite
-              </CardTitle>
-              <CardDescription>
-                Know someone specific? Invite them directly by username
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter warrior username..."
-                  value={searchUsername}
-                  onChange={(e) => setSearchUsername(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleDirectInvite()}
-                />
-                <Button 
-                  onClick={handleDirectInvite}
-                  disabled={!searchUsername.trim() || isInviting}
-                  className="gap-2"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {isInviting ? 'Sending...' : 'Invite'}
-                </Button>
-              </div>
-              
-              <div className="p-4 bg-muted/50 rounded-lg">
-                <h4 className="font-medium mb-2">Tips for Finding Battle Allies:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Use the "Discover" tab for AI-matched recommendations</li>
-                  <li>• Look for warriors with similar streaks and goals</li>
-                  <li>• Consider language and timezone compatibility</li>
-                  <li>• Shared beliefs and interests strengthen bonds</li>
-                </ul>
-              </div>
-
-              {allies.length > 0 && (
-                <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
-                  <h4 className="font-medium text-primary mb-2">Current Battle Allies: {allies.length}</h4>
-                  <p className="text-sm text-muted-foreground">
-                    You can have multiple battle allies to build a strong support network.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   )

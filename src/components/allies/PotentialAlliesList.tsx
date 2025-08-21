@@ -4,9 +4,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Users, MapPin, Languages, Heart, Star } from 'lucide-react'
+import { Users, MapPin, Languages, Heart, Star, Shield, Clock, Target } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useAllies } from '@/lib/hooks/useAllies'
+import { useAllyMatching } from '@/lib/hooks/useAllyMatching'
 
 interface PotentialAlly {
   user_id: string
@@ -19,6 +19,11 @@ interface PotentialAlly {
   best_streak: number
   timezone: string
   match_score: number
+  country?: string | null
+  interests?: string[]
+  age_group?: string
+  trust_score?: number
+  compatibility_reasons?: string[]
 }
 
 interface PotentialAlliesListProps {
@@ -26,46 +31,10 @@ interface PotentialAlliesListProps {
 }
 
 const PotentialAlliesList: React.FC<PotentialAlliesListProps> = ({ onInviteSent }) => {
-  const { inviteAlly, isInviting } = useAllies()
-  
-  // Mock data for potential allies (in real app, this would come from the API)
-  const potentialAllies: PotentialAlly[] = [
-    {
-      user_id: '1',
-      username: 'WarriorSeeker',
-      language: 'English',
-      secondary_language: 'Spanish',
-      religion: 'Christian',
-      bio: 'On a journey of self-improvement and faith.',
-      current_streak: 12,
-      best_streak: 25,
-      timezone: 'America/New_York',
-      match_score: 95
-    },
-    {
-      user_id: '2',
-      username: 'MindfulFighter',
-      language: 'English',
-      current_streak: 8,
-      best_streak: 15,
-      timezone: 'America/Los_Angeles',
-      match_score: 88
-    },
-    {
-      user_id: '3',
-      username: 'SteadyProgress',
-      language: 'English',
-      religion: 'Muslim',
-      bio: 'Consistency over perfection.',
-      current_streak: 6,
-      best_streak: 18,
-      timezone: 'Europe/London',
-      match_score: 82
-    }
-  ]
+  const { potentialAllies, sendInvitation, isSending, isLoading } = useAllyMatching()
 
-  const handleInvite = (username: string) => {
-    inviteAlly(username)
+  const handleInvite = (targetUserId: string) => {
+    sendInvitation({ targetUserId })
     onInviteSent()
   }
 
@@ -73,6 +42,27 @@ const PotentialAlliesList: React.FC<PotentialAlliesListProps> = ({ onInviteSent 
     if (score >= 90) return 'text-green-600 bg-green-50'
     if (score >= 80) return 'text-blue-600 bg-blue-50'
     return 'text-yellow-600 bg-yellow-50'
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[...Array(3)].map((_, i) => (
+          <Card key={i} className="border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="h-12 w-12 bg-muted animate-pulse rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 bg-muted animate-pulse rounded w-1/3" />
+                  <div className="h-3 bg-muted animate-pulse rounded w-1/2" />
+                  <div className="h-3 bg-muted animate-pulse rounded w-2/3" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    )
   }
 
   return (
@@ -101,6 +91,12 @@ const PotentialAlliesList: React.FC<PotentialAlliesListProps> = ({ onInviteSent 
                         <Star className="h-3 w-3 mr-1" />
                         {ally.match_score}% match
                       </Badge>
+                      {ally.trust_score && ally.trust_score >= 90 && (
+                        <Badge variant="secondary" className="text-xs">
+                          <Shield className="h-3 w-3 mr-1" />
+                          Trusted
+                        </Badge>
+                      )}
                     </div>
                     
                     <div className="flex items-center gap-3 text-sm text-muted-foreground mb-2">
@@ -128,6 +124,27 @@ const PotentialAlliesList: React.FC<PotentialAlliesListProps> = ({ onInviteSent 
                       </p>
                     )}
 
+                    {ally.compatibility_reasons && ally.compatibility_reasons.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {ally.compatibility_reasons.slice(0, 3).map((reason, i) => (
+                          <Badge key={i} variant="outline" className="text-xs">
+                            {reason}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    {ally.interests && ally.interests.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {ally.interests.slice(0, 4).map((interest, i) => (
+                          <Badge key={i} variant="secondary" className="text-xs">
+                            <Target className="h-3 w-3 mr-1" />
+                            {interest}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-4 text-sm">
                       <div>
                         <span className="text-muted-foreground">Current: </span>
@@ -141,14 +158,19 @@ const PotentialAlliesList: React.FC<PotentialAlliesListProps> = ({ onInviteSent 
                   </div>
                 </div>
 
-                <Button 
-                  onClick={() => handleInvite(ally.username)}
-                  disabled={isInviting}
-                  className="gap-2 shrink-0"
-                >
-                  <Users className="h-4 w-4" />
-                  {isInviting ? 'Inviting...' : 'Invite'}
-                </Button>
+                <div className="flex flex-col gap-2 shrink-0">
+                  <Button 
+                    onClick={() => handleInvite(ally.user_id)}
+                    disabled={isSending}
+                    className="gap-2"
+                  >
+                    <Users className="h-4 w-4" />
+                    {isSending ? 'Inviting...' : 'Start Trial'}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    7-day trial period
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

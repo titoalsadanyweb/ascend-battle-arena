@@ -956,14 +956,19 @@ export type Database = {
       find_potential_allies: {
         Args: { p_limit?: number; p_user_id: string }
         Returns: {
+          age_group: string
           best_streak: number
           bio: string
+          compatibility_reasons: string[]
+          country: string
           current_streak: number
+          interests: string[]
           language: string
           match_score: number
           religion: string
           secondary_language: string
           timezone: string
+          trust_score: number
           user_id: string
           username: string
         }[]
